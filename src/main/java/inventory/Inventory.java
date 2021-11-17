@@ -4,6 +4,7 @@ import org.jsoup.Jsoup;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Map;
 
 public class Inventory {
@@ -11,7 +12,8 @@ public class Inventory {
     private ArrayList<InventoryItem> inventoryArray;
 
     public Inventory(){
-
+        this.inventoryArray = new ArrayList<InventoryItem>();
+        this.inventoryMap = new HashMap<String,InventoryItem>();
     }
     InventoryItem createInventoryItem(String serialNumber, String name, double price){
         InventoryItem item = new InventoryItem(serialNumber,name,price);
@@ -20,15 +22,17 @@ public class Inventory {
     //Adds an item to both map and Array
     void addItem(InventoryItem item){
             //Add item to map
-
+            this.inventoryMap.put(item.getSerialNumber(),item);
             //Add item to Array
+            this.inventoryArray.add(item);
     }
 
     void removeItem(InventoryItem item){
         //Retrieve object using the map key
+        this.inventoryMap.remove(item.getSerialNumber());
         //Find object in array with .get()
         //Remove object from array
-
+        this.inventoryArray.remove(item);
         //Use key to remove item in map
 
 
@@ -36,20 +40,26 @@ public class Inventory {
 
     void clearList(){
         //.clear() for map and array
+        this.inventoryArray.clear();
+        this.inventoryMap.clear();
     }
 
-    void editItemName(String newName){
+    void editItemName(String newName,String serialNumber){
         //Find key using item name
+        InventoryItem item = inventoryMap.get(serialNumber);
         //Use the object retrieved from key to search in array
-
+        this.inventoryMap.get(serialNumber).setName(newName);
         //Set name
+        this.inventoryArray.get(this.inventoryArray.indexOf(item)).setName(newName);
     }
 
-    void editSerialNumber(String newSerial){
+    void editSerialNumber(String newSerial,String serialNumber){
         //Find key using item name
+        InventoryItem item = inventoryMap.get(serialNumber);
         //Use the object retrieved from key to search in array
-
+        this.inventoryMap.get(serialNumber).setSerialNumber(newSerial);
         //Set name
+        this.inventoryArray.get(this.inventoryArray.indexOf(item)).setSerialNumber(serialNumber);
     }
 
     void readFile(File file){
@@ -109,5 +119,19 @@ public class Inventory {
         //Save using GSON
     }
 
+    public Map<String, InventoryItem> getInventoryMap() {
+        return inventoryMap;
+    }
 
+    public void setInventoryMap(Map<String, InventoryItem> inventoryMap) {
+        this.inventoryMap = inventoryMap;
+    }
+
+    public ArrayList<InventoryItem> getInventoryArray() {
+        return inventoryArray;
+    }
+
+    public void setInventoryArray(ArrayList<InventoryItem> inventoryArray) {
+        this.inventoryArray = inventoryArray;
+    }
 }

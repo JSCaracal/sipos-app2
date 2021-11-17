@@ -14,6 +14,12 @@ class Inventory {
     +void editItemSerialNumber(String newSerial)
     +void readFile(File file)
     +void writeFile(File file)
+    +void tsbReader()
+    +void htmlReader()
+    +void jsonReader()
+    +void tsbWriter()
+    +void htmlWriter()
+    +void jsonWriter()
 }
 
 class InventoryItem{
