@@ -1,0 +1,28 @@
+@startuml
+'https://plantuml.com/class-diagram
+
+
+class Inventory {
+    -map<String,InventoryItem>
+    -ArrayList<InventoryItem>
+
+    +InventoryItem createInventoryItem(String serialNumber, String name, double price)
+    +void addItem(InventoryItem item)
+    +void removeItem(InventoryItem item)
+    +void clearList()
+    +void editItemName(String newName)
+    +void editItemSerialNumber(String newSerial)
+    +void readFile(File file)
+    +void writeFile(File file)
+}
+
+class InventoryItem{
+    -String serialNumber
+    -String name
+    -double price
+
+}
+
+Inventory*--InventoryItem
+
+@enduml
