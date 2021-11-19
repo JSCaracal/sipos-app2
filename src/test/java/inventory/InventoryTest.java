@@ -10,6 +10,7 @@ class InventoryTest {
     Inventory testInventory;
     InventoryItem item1 = new InventoryItem("j-0c3-ow2-4dx","Gatorade",2.30);
     InventoryItem item2 = new InventoryItem("h-0c5-ow3-4dx","Sprite",2.00);
+
     @BeforeEach
     void testItemInit(){
         testInventory = new Inventory();
@@ -47,14 +48,44 @@ class InventoryTest {
 
     @Test
     void clearList() {
+        testInventory.addItem(item1);
+        testInventory.addItem(item2);
+        testInventory.clearList();
+        assertEquals("[]",testInventory.getInventoryArray().toString());
+        assertEquals("{}",testInventory.getInventoryMap().toString());
     }
 
     @Test
     void editItemName() {
+        testInventory.addItem(item1);
+        testInventory.editItemName("Blue Gatorade", item1.getSerialNumber());
+        assertEquals("Blue Gatorade",testInventory.getInventoryMap().get(item1.getSerialNumber()).getName());
+        assertEquals("Blue Gatorade",testInventory.getInventoryArray().get(testInventory.getInventoryArray().indexOf(item1)).getName());
     }
 
     @Test
     void editSerialNumber() {
+        testInventory.addItem(item1);
+        testInventory.editSerialNumber("h-0c5-ow3-4dx",item1);
+        int itemIndex = testInventory.getInventoryArray().indexOf(item1);
+        assertEquals("h-0c5-ow3-4dx",testInventory.getInventoryArray().get(itemIndex).getSerialNumber());
+        assertEquals("h-0c5-ow3-4dx",testInventory.getInventoryMap().get(item1.getSerialNumber()).getSerialNumber());
+    }
+
+    @Test
+    void isValidSerial(){
+        String serial1 = "h-0c5-ow3-4dx";
+        String serial2 = "2-0c5-ow3-4dx";
+        String serial3 = "c-0c5+ow3-4dx";
+        String serial4 = "c-0c5-ofw3-4dx";
+        String serial5 = "c-05-ow3-4dx";
+        String serial6 = "%-0c5-ow3-4dx";
+        assertEquals(true,testInventory.isValidSerial(serial1));
+        assertEquals(false,testInventory.isValidSerial(serial2));
+        assertEquals(false,testInventory.isValidSerial(serial3));
+        assertEquals(false,testInventory.isValidSerial(serial4));
+        assertEquals(false,testInventory.isValidSerial(serial5));
+        assertEquals(false,testInventory.isValidSerial(serial6));
     }
 
     @Test

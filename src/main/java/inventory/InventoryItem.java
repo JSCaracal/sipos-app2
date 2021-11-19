@@ -5,7 +5,7 @@ public class InventoryItem {
     private String name;
     private double price;
 
-    InventoryItem(String serialNumber,String name, double price){
+    public InventoryItem(String serialNumber,String name, double price){
         this.serialNumber = serialNumber;
         this.name = name;
         this.price = price;

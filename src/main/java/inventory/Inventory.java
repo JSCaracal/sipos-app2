@@ -1,65 +1,94 @@
 package inventory;
 
+import javafx.beans.InvalidationListener;
+import javafx.collections.FXCollections;
+import javafx.collections.ListChangeListener;
+import javafx.collections.ObservableList;
 import org.jsoup.Jsoup;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
+
 
 public class Inventory {
     private Map<String,InventoryItem> inventoryMap;
     private ArrayList<InventoryItem> inventoryArray;
+    private ObservableList<InventoryItem> inventoryObList;
 
-    public Inventory(){
+    public Inventory() {
         this.inventoryArray = new ArrayList<InventoryItem>();
-        this.inventoryMap = new HashMap<String,InventoryItem>();
+        this.inventoryMap = new HashMap<String, InventoryItem>();
+        this.inventoryObList = FXCollections.observableArrayList();
     }
     InventoryItem createInventoryItem(String serialNumber, String name, double price){
         InventoryItem item = new InventoryItem(serialNumber,name,price);
         return item;
     }
     //Adds an item to both map and Array
-    void addItem(InventoryItem item){
+    public void addItem(InventoryItem item){
             //Add item to map
             this.inventoryMap.put(item.getSerialNumber(),item);
             //Add item to Array
             this.inventoryArray.add(item);
+            //Add item to ObserList
+            this.inventoryObList.add(item);
     }
 
-    void removeItem(InventoryItem item){
+    public void removeItem(InventoryItem item){
         //Retrieve object using the map key
         this.inventoryMap.remove(item.getSerialNumber());
         //Find object in array with .get()
         //Remove object from array
         this.inventoryArray.remove(item);
         //Use key to remove item in map
-
+        //Remove from Oblist
+        this.inventoryObList.remove(item);
 
     }
 
-    void clearList(){
+    public void clearList(){
         //.clear() for map and array
         this.inventoryArray.clear();
         this.inventoryMap.clear();
+        this.inventoryObList.clear();
     }
 
-    void editItemName(String newName,String serialNumber){
+    public void editItemName(String newName,String serialNumber){
         //Find key using item name
         InventoryItem item = inventoryMap.get(serialNumber);
         //Use the object retrieved from key to search in array
         this.inventoryMap.get(serialNumber).setName(newName);
         //Set name
         this.inventoryArray.get(this.inventoryArray.indexOf(item)).setName(newName);
+        this.inventoryObList.get(this.inventoryObList.indexOf(item)).setName(newName);
     }
 
-    void editSerialNumber(String newSerial,String serialNumber){
+    public void editSerialNumber(String newSerial,InventoryItem item){
         //Find key using item name
-        InventoryItem item = inventoryMap.get(serialNumber);
+        String oldSerial = this.inventoryMap.get(item.getSerialNumber()).getSerialNumber();
+        this.inventoryArray.get(this.inventoryArray.indexOf(item)).setSerialNumber(newSerial);
         //Use the object retrieved from key to search in array
-        this.inventoryMap.get(serialNumber).setSerialNumber(newSerial);
+        this.inventoryMap.remove(oldSerial);
+        this.inventoryMap.put(newSerial,item);
         //Set name
-        this.inventoryArray.get(this.inventoryArray.indexOf(item)).setSerialNumber(serialNumber);
+        this.inventoryObList.get(this.inventoryObList.indexOf(item)).setSerialNumber(newSerial);
+    }
+
+   public boolean isValidSerial(String serial){
+        if(serial.length() != 13){
+            return false;
+        }
+        char firstIndex = serial.charAt(0);
+        if(firstIndex < 65 || firstIndex > 90 && firstIndex < 97 || firstIndex > 122){
+            return false;
+        }
+        for(int i = 1; i < serial.length(); i+=4){
+
+                if(serial.charAt(i) != 45){
+                    return false;
+                }
+        }
+        return true;
     }
 
     void readFile(File file){
@@ -134,4 +163,13 @@ public class Inventory {
     public void setInventoryArray(ArrayList<InventoryItem> inventoryArray) {
         this.inventoryArray = inventoryArray;
     }
+
+    public ObservableList<InventoryItem> getInventoryObList() {
+        return inventoryObList;
+    }
+
+    public void setInventoryObList(ObservableList<InventoryItem> inventoryObList) {
+        this.inventoryObList = inventoryObList;
+    }
+
 }
