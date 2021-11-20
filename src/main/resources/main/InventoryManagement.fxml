@@ -34,11 +34,11 @@
           </Menu>
         </menus>
       </MenuBar>
-      <TableView fx:id="mainTableView" layoutX="-1.0" layoutY="277.0" prefHeight="252.0" prefWidth="823.0">
+      <TableView fx:id="mainTableView" editable="true" layoutX="-1.0" layoutY="277.0" prefHeight="252.0" prefWidth="823.0">
         <columns>
             <TableColumn fx:id="tableColSerialNumber" onEditCommit="#editSerialNumber" prefWidth="340.0" text="Serial Number" />
           <TableColumn fx:id="tableColName" minWidth="8.0" onEditCommit="#editName" prefWidth="303.0" text="Name" />
-          <TableColumn fx:id="tableColPrice" onEditCommit="#editPrice" prefWidth="179.0" text="Price" />
+          <TableColumn fx:id="tableColPrice" prefWidth="179.0" text="Price" />
         </columns>
       </TableView>
       <HBox layoutX="7.0" layoutY="530.0" prefHeight="39.0" prefWidth="815.0" spacing="15.0">

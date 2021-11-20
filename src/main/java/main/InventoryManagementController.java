@@ -1,13 +1,19 @@
+//Filtered Data turotial found at https://code.makery.ch/blog/javafx-8-tableview-sorting-filtering/
+
 package main;
 import inventory.Inventory;
 import inventory.InventoryItem;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.collections.transformation.FilteredList;
+import javafx.collections.transformation.SortedList;
 import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.input.KeyEvent;
 
 import java.net.URL;
@@ -72,6 +78,7 @@ public class InventoryManagementController implements Initializable {
         tableColName.setCellValueFactory(
                 new PropertyValueFactory<InventoryItem,String>("name")
         );
+        tableColName.setCellFactory(TextFieldTableCell.forTableColumn());
 
         tableColPrice.setCellValueFactory(
                 new PropertyValueFactory<InventoryItem,Double>("price")
@@ -80,6 +87,7 @@ public class InventoryManagementController implements Initializable {
         tableColSerialNumber.setCellValueFactory(
                 new PropertyValueFactory<InventoryItem,String>("serialNumber")
         );
+        tableColSerialNumber.setCellFactory(TextFieldTableCell.forTableColumn());
         tableColPrice.setCellFactory(tc->new TableCell<InventoryItem,Double>(){
             @Override
             protected void updateItem(Double price, boolean empty){
@@ -92,17 +100,60 @@ public class InventoryManagementController implements Initializable {
             }
                 }
         );
+        FilteredList<InventoryItem> filteredData = new FilteredList<>(inventoryList.getInventoryObList(), p -> true);
+
+        // 2. Set the filter Predicate whenever the filter changes.
+
+
+        textFieldSerialSearch.textProperty().addListener((observable, oldValue, newValue) -> {
+            filteredData.setPredicate(InventoryItem -> {
+                // If filter text is empty, display all persons.
+                if (newValue == null || newValue.isEmpty()) {
+                    return true;
+                }
+                // Compare first name and last name of every person with filter text.
+                String lowerCaseFilter = newValue.toLowerCase();
+                if (InventoryItem.getSerialNumber().toLowerCase().contains(lowerCaseFilter)) {
+                    return true; // Filter matches last name.
+                }
+                return false; // Does not match.
+            });
+        });
+
+        textFieldNameSearch.textProperty().addListener((observable, oldValue, newValue) -> {
+            filteredData.setPredicate(InventoryItem -> {
+                // If filter text is empty, display all persons.
+                if (newValue == null || newValue.isEmpty()) {
+                    return true;
+                }
+                // Compare first name and last name of every person with filter text.
+                String lowerCaseFilter = newValue.toLowerCase();
+                if (InventoryItem.getName().toLowerCase().contains(lowerCaseFilter)) {
+                    return true; // Filter matches last name.
+                }
+                return false; // Does not match.
+            });
+        });
+
+        // 3. Wrap the FilteredList in a SortedList.
+        SortedList<InventoryItem> sortedData = new SortedList<>(filteredData);
+
+        // 4. Bind the SortedList comparator to the TableView comparator.
+        sortedData.comparatorProperty().bind(mainTableView.comparatorProperty());
+
+        // 5. Add sorted (and filtered) data to the table.
+        mainTableView.setItems(sortedData);
+
     }
 
     @FXML
     void addItemToList(ActionEvent event) {
         InventoryItem item = getUserEnteredInfo();
         //Prevents errors
-        if(item == null){
+        if(item == null || inventoryList.getInventoryArray().size() >1024){
             return;
         }
         inventoryList.addItem(item);
-        mainTableView.setItems(inventoryList.getInventoryObList());
 
 
     }
@@ -116,23 +167,26 @@ public class InventoryManagementController implements Initializable {
     @FXML
     //Literaly closes theprogram
     void closeProgram(ActionEvent event) {
-
+        InventoryItem item1 = new InventoryItem("j-0c3-ow2-4dx","Gatorade",2.30);
+        InventoryItem item2 = new InventoryItem("h-0c5-ow3-4dx","Sprite",2.00);
+        inventoryList.addItem(item1);
+        inventoryList.addItem(item2);
     }
 
     @FXML
-    void editName(ActionEvent event) {
+    void editName(TableColumn.CellEditEvent<InventoryItem,String>event) {
+
         //get the text input from the tableView
+        InventoryItem item = event.getRowValue();
+        String newName = event.getNewValue();
         //Call the editname function
+        inventoryList.editItemName(newName,item.getSerialNumber());
+        //inventoryList.editItemName(event.getNewValue(),item.getName());
         //Once enter is pressed update tableview
+
 
     }
 
-    @FXML
-    void editPrice(ActionEvent event) {
-        //get the text input from the tableView
-        //Call the editPrice function
-        //Once enter is pressed update tableview
-    }
 
     @FXML
     void editSerialNumber(ActionEvent event) {
@@ -164,10 +218,10 @@ public class InventoryManagementController implements Initializable {
             InventoryItem item = inventoryList.getInventoryArray().get(inventoryList.getInventoryArray().indexOf(selection.get(i)));
             //Call remove function for backend
             inventoryList.removeItem(item);
+            mainTableView.getItems().remove(item);
         }
 
         //product selected and remove
-        selection.forEach(all::remove);
     }
 
     @FXML
@@ -230,6 +284,20 @@ public class InventoryManagementController implements Initializable {
         errorAlert.setHeaderText("ERROR! ERROR!");
         errorAlert.setContentText(errorMessage);
         errorAlert.showAndWait();
+    }
+
+    void searchHelper(String name){
+        if(inventoryList.searchByName(name).equals("")){
+            return;
+        }
+        else{
+            //Display only the searched result(s)
+            ObservableList<InventoryItem> searchResults;
+            //Make new ObList with only the results
+
+            //remove current table view
+            //If clear return the old list
+        }
     }
 
 }

@@ -34,6 +34,15 @@ public class Inventory {
             this.inventoryObList.add(item);
     }
 
+    public String searchByName(String name){
+        for (InventoryItem item:this.getInventoryArray()) {
+            if(item.getName().equals(name)){
+                return item.getName();
+            }
+        }
+        return "";
+    }
+
     public void removeItem(InventoryItem item){
         //Retrieve object using the map key
         this.inventoryMap.remove(item.getSerialNumber());
