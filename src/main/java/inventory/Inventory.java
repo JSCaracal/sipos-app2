@@ -1,11 +1,8 @@
 package inventory;
 
 import com.google.gson.Gson;
-import com.google.gson.JsonElement;
 import com.google.gson.reflect.TypeToken;
-import javafx.beans.InvalidationListener;
 import javafx.collections.FXCollections;
-import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -13,8 +10,7 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 import java.io.*;
-import java.nio.file.Files;
-import java.nio.file.Paths;
+
 import java.util.*;
 
 
@@ -29,8 +25,8 @@ public class Inventory {
         this.inventoryObList = FXCollections.observableArrayList();
     }
     InventoryItem createInventoryItem(String serialNumber, String name, double price){
-        InventoryItem item = new InventoryItem(serialNumber,name,price);
-        return item;
+        return new InventoryItem(serialNumber,name,price);
+
     }
     //Adds an item to both map and Array
     public void addItem(InventoryItem item){
@@ -120,6 +116,7 @@ public class Inventory {
     }
 
     public boolean isSerialSame(String serial){
+
         if(this.inventoryMap.get(serial) != null){
             return true;
         }
@@ -131,14 +128,14 @@ public class Inventory {
         //If file is .tsb
         if(file.toString().endsWith(".tsb")){
             tsbReader(file);
-            return;
+
         }
         //Call the TSB method
         //Else if the file is .html
         else if(file.toString().endsWith(".html")){
             //Call the htmlReader() method
             htmlReader(file);
-            return;
+
         }
         else if(file.toString().endsWith(".json")){
             jsonReader(file);
@@ -155,21 +152,18 @@ public class Inventory {
         if(filePath.endsWith(".tsb")){
             //Call tsbWriter
             tsbWriter(file);
-            return;
+
         }
         //Else if .html
         else if(filePath.endsWith(".html")){
             //Call .htmlWriter
             htmlWriter(file);
-            return;
+
         }
         //Else .jsonWriter
         else if(filePath.endsWith(".json")) {
             jsonWriter(file);
-            return;
-        }
-        else {
-            return;
+
         }
 
 
@@ -204,7 +198,9 @@ public class Inventory {
                 }
                 index = 0;
                 addItem(item);
+                dataReader.close();
         }
+            fileReader.close();
         }catch(IOException e){
             e.printStackTrace();
         }
@@ -310,7 +306,7 @@ public class Inventory {
             gson.toJson(this.inventoryArray,writer);
             writer.close();
         }catch (IOException e){
-
+            e.printStackTrace();
         }
 
     }

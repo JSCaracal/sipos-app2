@@ -10,6 +10,8 @@
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.control.cell.PropertyValueFactory?>
 <?import javafx.scene.control.cell.TextFieldTableCell?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.HBox?>
 
@@ -61,8 +63,8 @@
       </HBox>
       <HBox layoutX="14.0" layoutY="252.0" prefHeight="25.0" prefWidth="591.0" spacing="200.0">
          <children>
-            <TextField fx:id="textFieldSerialSearch" onKeyTyped="#searchForSerial" prefHeight="25.0" prefWidth="156.0" promptText="Search by Serial" />
-            <TextField fx:id="textFieldNameSearch" onKeyTyped="#searchForName" promptText="Search By Name">
+            <TextField fx:id="textFieldSerialSearch" prefHeight="25.0" prefWidth="156.0" promptText="Search by Serial" />
+            <TextField fx:id="textFieldNameSearch" promptText="Search By Name">
                <HBox.margin>
                   <Insets />
                </HBox.margin>
@@ -75,5 +77,10 @@
             <Button fx:id="bttnConfirmPriceEdit" mnemonicParsing="false" onAction="#editPrice" text="edit price" />
          </children>
       </HBox>
+      <ImageView fitHeight="225.0" fitWidth="815.0" layoutX="7.0" layoutY="25.0" pickOnBounds="true">
+         <image>
+            <Image url="@../../../../docs/catImage.jpg" />
+         </image>
+      </ImageView>
    </children>
 </AnchorPane>

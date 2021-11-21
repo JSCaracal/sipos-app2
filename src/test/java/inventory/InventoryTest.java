@@ -3,6 +3,12 @@ package inventory;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
+
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -99,33 +105,23 @@ class InventoryTest {
 
     @Test
     void readFile() {
+        testInventory.addItem(item1);
+        testInventory.addItem(item2);
+        Inventory readerInventory = new Inventory();
+        File test1 = new File(".\\src\\test\\java\\inventory\\InventoryListTest1.tsb");
+        File test2 = new File(".\\src\\test\\java\\inventory\\InventoryListTest2.html");
+        File test3 = new File(".\\src\\test\\java\\inventory\\InventoryListTest3.json");
+        readerInventory.readFile(test1);
+        assertEquals(true,readerInventory.getInventoryArray().get(0).getSerialNumber().equals(testInventory.getInventoryArray().get(0).getSerialNumber()));
+        readerInventory.readFile(test2);
+        assertEquals(true,readerInventory.getInventoryArray().get(0).getSerialNumber().equals(testInventory.getInventoryArray().get(0).getSerialNumber()));
+        readerInventory.readFile(test3);
+        assertEquals(true,readerInventory.getInventoryArray().get(0).getSerialNumber().equals(testInventory.getInventoryArray().get(0).getSerialNumber()));
     }
 
     @Test
-    void writeFile() {
+    void writeFile(@TempDir Path temp) {
+
     }
 
-    @Test
-    void tsbReader() {
-    }
-
-    @Test
-    void htmlReader() {
-    }
-
-    @Test
-    void jsonReader() {
-    }
-
-    @Test
-    void tsbWriter() {
-    }
-
-    @Test
-    void htmlWriter() {
-    }
-
-    @Test
-    void jsonWriter() {
-    }
 }

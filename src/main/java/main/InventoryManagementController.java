@@ -8,18 +8,15 @@ import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
 import javafx.collections.transformation.SortedList;
 import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.control.cell.TextFieldTableCell;
-import javafx.scene.input.KeyEvent;
 import javafx.stage.FileChooser;
 import javafx.stage.Window;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.net.URL;
 import java.text.NumberFormat;
 import java.util.ResourceBundle;
@@ -185,12 +182,9 @@ public class InventoryManagementController implements Initializable {
     }
 
     @FXML
-    //Literaly closes theprogram
+    //Closes the program
     void closeProgram(ActionEvent event) {
-        InventoryItem item1 = new InventoryItem("j-0c3-ow2-4dx","Gatorade",2.30);
-        InventoryItem item2 = new InventoryItem("h-0c5-ow3-4dx","Sprite",2.00);
-        inventoryList.addItem(item1);
-        inventoryList.addItem(item2);
+        System.exit(0);
     }
 
     @FXML
@@ -199,9 +193,12 @@ public class InventoryManagementController implements Initializable {
         //get the text input from the tableView
         InventoryItem item = event.getRowValue();
         String newName = event.getNewValue();
+        if(newName.length() < 2 || newName.length() > 256){
+            alertNotification("Please enter a valid name between 2 or 256 characters!");
+            return;
+        }
         //Call the editname function
         inventoryList.editItemName(newName,item.getSerialNumber());
-        //inventoryList.editItemName(event.getNewValue(),item.getName());
         //Once enter is pressed update tableview
 
 
@@ -214,9 +211,10 @@ public class InventoryManagementController implements Initializable {
         InventoryItem item = event.getRowValue();
         String newSerial = event.getNewValue();
         //Error handle Bad Serial
-        if(inventoryList.isValidSerial(newSerial) == false){
+        if(!inventoryList.isValidSerial(newSerial)){
             alertNotification("Please make sure the serial you entered is in the format" +
                     " A-XXX-XXX-XXX, A must be a letter");
+            mainTableView.refresh();
             return;
         }
         //Call the editSerialNumber function
@@ -228,13 +226,17 @@ public class InventoryManagementController implements Initializable {
     @FXML
     void editPrice(ActionEvent event){
             InventoryItem item = mainTableView.getSelectionModel().getSelectedItem();
-            if(editPricePrompt.getText().equals(null)){
+            if(editPricePrompt.getText() == null){
                 alertNotification("The price cannot be left empty");
                 return;
             }
             double newPrice;
             try {
                 newPrice = Double.parseDouble(editPricePrompt.getText());
+                if (newPrice < 0){
+                    alertNotification("The price cannot be less than 0");
+                    return;
+                }
             }catch (NumberFormatException e){
                 alertNotification("Make sure you formatted the price corecctly.");
                 return;
@@ -246,14 +248,33 @@ public class InventoryManagementController implements Initializable {
 
     @FXML
     void openTut(ActionEvent event) {
-        //Opens help file to be helpful :)
+        //Opens help file to be helpful
+        Alert tutorial = new Alert(Alert.AlertType.CONFIRMATION);
+        tutorial.setHeaderText("How to use Josh Sipos' Inventory Management System");
+        tutorial.setContentText("""
+                Step 1. At the bottom of your Screen Enter in your serial number, name and price.
+                Step 2. Click the add button, and if any errors occur, correct them as prompted.
+                
+                If you want to edit either the serial number or item name, double click it and press enter, you will be prompted 
+                if any errors were made inputting your changes
+                
+                In order to edit price, select the item on the table you want to edit. Right above the price column there is a text prompt
+                that will allow you to enter the new price. Click the button next to the prompt once changes have been made.
+                
+                Sorting is done automatically when you click the column headers. 
+                
+                Files can be saved as TSV, HTML, or JSON files
+                """);
+        tutorial.setTitle("Tutorial Popup");
+        tutorial.showAndWait();
+        mainTableView.refresh();
+
     }
     @FXML
     void removeItemFromList(ActionEvent event) {
         //Make an observible list
-        ObservableList<InventoryItem> selection,all;
+        ObservableList<InventoryItem> selection;
         //Get selected item from tableView
-        all = mainTableView.getItems();
         selection = mainTableView.getSelectionModel().getSelectedItems();
         //Retrieves it from Array list using object/index of
         for(int i = 0; i < selection.size(); i++){
@@ -308,18 +329,6 @@ public class InventoryManagementController implements Initializable {
         //Clear tableView
     }
 
-    @FXML
-    void searchForName(KeyEvent event) {
-        //Called when every key is pressed
-        //Calls a searchMethod
-    }
-
-    @FXML
-    void searchForSerial(KeyEvent event) {
-        //Called when every key is pressed
-        //Calls a searchMethod
-    }
-
     /**
      * Helper Functions
      */
@@ -336,12 +345,16 @@ public class InventoryManagementController implements Initializable {
         double price;
         try {
              price = Double.parseDouble(userInfo[2]);
+             if(price < 0){
+                 alertNotification("Do not enter a value less than 0");
+                 return null;
+             }
         }catch (NumberFormatException e){
             alertNotification("The price format was not valid, try again");
             return null;
         }
         //Error Handle Text Fields
-        if(inventoryList.isValidSerial(userInfo[0]) == false){
+        if(!inventoryList.isValidSerial(userInfo[0])){
             alertNotification("Please make sure the serial you entered is in the format " +
                     "A-XXX-XXX-XXX, A must be a letter");
             return null;
@@ -362,6 +375,7 @@ public class InventoryManagementController implements Initializable {
         errorAlert.setHeaderText("ERROR! ERROR!");
         errorAlert.setContentText(errorMessage);
         errorAlert.showAndWait();
+        mainTableView.refresh();
     }
 
 
