@@ -11,6 +11,10 @@ public class InventoryItem {
         this.price = price;
     }
 
+    public InventoryItem(){
+
+    }
+
     public String getSerialNumber() {
         return serialNumber;
     }

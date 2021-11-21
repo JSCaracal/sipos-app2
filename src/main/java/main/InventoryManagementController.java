@@ -28,7 +28,7 @@ public class InventoryManagementController implements Initializable {
     Inventory inventoryList = new Inventory();
     ObservableList<InventoryItem> obList = FXCollections.observableArrayList();
     NumberFormat currency = NumberFormat.getCurrencyInstance();
-    FileChooser fileChooser = new FileChooser();
+
 
     @FXML
     private Button bttnAdd;
@@ -245,13 +245,6 @@ public class InventoryManagementController implements Initializable {
     }
 
     @FXML
-    void loadFile(ActionEvent event) {
-        //User menu box to retrieve file
-        //call the readFile method, has the logic required
-        //Clear tableView
-    }
-
-    @FXML
     void openTut(ActionEvent event) {
         //Opens help file to be helpful :)
     }
@@ -276,16 +269,43 @@ public class InventoryManagementController implements Initializable {
     @FXML
     void saveInventory(ActionEvent event) {
         //User menubox
-        Window stage = mainMenuBar.getScene().getWindow();
-        fileChooser.setTitle("Save Inventory");
-        fileChooser.setInitialFileName("InventoryList");
-        fileChooser.getExtensionFilters().addAll(new FileChooser.ExtensionFilter("TSB File","*.tsb")
-        ,new FileChooser.ExtensionFilter("HTML File","*.html"),new FileChooser.ExtensionFilter("JSON file","*" +
-                        ".json"));
-        //Call the writeFile method, has required logic
-        File file = fileChooser.showSaveDialog(stage);
-        fileChooser.setInitialDirectory(file);
-        inventoryList.writeFile(file);
+        FileChooser fileChooser = new FileChooser();
+        try {
+            Window stage = mainMenuBar.getScene().getWindow();
+            fileChooser.setTitle("Save Inventory");
+            fileChooser.setInitialFileName("InventoryList");
+            fileChooser.getExtensionFilters().addAll(new FileChooser.ExtensionFilter("TSB File","*.tsb")
+                    ,new FileChooser.ExtensionFilter("HTML File","*.html"),new FileChooser.ExtensionFilter("JSON file","*" +
+                            ".json"));
+            //Call the writeFile method, has required logic
+            File file = fileChooser.showSaveDialog(stage);
+            fileChooser.setInitialDirectory(file);
+            inventoryList.writeFile(file);
+        }catch (IllegalArgumentException e){
+            e.printStackTrace();
+        }
+
+    }
+
+    @FXML
+    void loadFile(ActionEvent event) {
+        //User menu box to retrieve file
+        FileChooser fileChooser = new FileChooser();
+        try {
+            Window stage = mainMenuBar.getScene().getWindow();
+            fileChooser.setTitle("Load Inventory");
+            fileChooser.getExtensionFilters().addAll(new FileChooser.ExtensionFilter("TSB File","*.tsb")
+                    ,new FileChooser.ExtensionFilter("HTML File","*.html"),new FileChooser.ExtensionFilter("JSON file","*" +
+                            ".json"));
+            //call the readFile method, has the logic required
+            File file = fileChooser.showOpenDialog(stage);
+            fileChooser.setInitialDirectory(file);
+            inventoryList.readFile(file);
+        }catch (IllegalArgumentException e){
+            e.printStackTrace();
+        }
+
+        //Clear tableView
     }
 
     @FXML

@@ -1,15 +1,20 @@
 package inventory;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonElement;
+import com.google.gson.reflect.TypeToken;
 import javafx.beans.InvalidationListener;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
 
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.*;
 
 
@@ -121,12 +126,23 @@ public class Inventory {
         return false;
     }
 
-    void readFile(File file){
+    public void readFile(File file){
         //Try
         //If file is .tsb
+        if(file.toString().endsWith(".tsb")){
+            tsbReader(file);
+            return;
+        }
         //Call the TSB method
         //Else if the file is .html
-        //Call the htmlReader() method
+        else if(file.toString().endsWith(".html")){
+            //Call the htmlReader() method
+            htmlReader(file);
+            return;
+        }
+        else if(file.toString().endsWith(".json")){
+            jsonReader(file);
+        }
         //Else if .json
         //Call the jsonReader() method
         //Catch fileIOException
@@ -158,9 +174,40 @@ public class Inventory {
 
 
     }
-    void tsbReader(){
+    void tsbReader(File file){
         //Clear the current Inventory to make way for the new Inventory
+        clearList();
         //Create scanner  for each line
+        try {
+            Scanner fileReader = new Scanner(file);
+            Scanner dataReader = null;
+            int index = 0;
+            while(fileReader.hasNextLine()){
+                dataReader = new Scanner(fileReader.nextLine());
+                dataReader.useDelimiter("\t");
+                InventoryItem item = new InventoryItem();
+                while (dataReader.hasNext()){
+                    String data = dataReader.next();
+                    if(index == 0){
+                        item.setSerialNumber(data);
+                    }
+                    else if(index == 1){
+                        item.setName(data);
+                    }
+                    else if(index == 2){
+                        item.setPrice(Double.parseDouble(data));
+                    }
+                    else{
+                        System.out.println(data);
+                    }
+                    index++;
+                }
+                index = 0;
+                addItem(item);
+        }
+        }catch(IOException e){
+            e.printStackTrace();
+        }
         //Create Scanner for each value in the line
         //While nextLine
             //Data reader scans each line while using the delimiter "\t"
@@ -173,16 +220,53 @@ public class Inventory {
             //Add item to list
 
     }
-    void htmlReader(){
+    void htmlReader(File file){
         //Clear inventory
+        clearList();
+        String rawText;
+        StringBuilder builder = new StringBuilder();
+
         //Create scanner to read each line
+        try {
+            Scanner reader = new Scanner(file);
+            //Read file into string
+            while(reader.hasNextLine()){
+                builder.append(reader.nextLine());
+            }
+            rawText = builder.toString();
+            //Parse the raw text
+            Document doc = Jsoup.parse(rawText);
+            //Get the rows without the HTML tags
+            Element table = doc.select("table").get(0);
+            Elements rows = table.select("tr");
+            for(int i = 1; i < rows.size(); i++) {
+                Element r = rows.get(i);
+                Elements c = r.select("td");
+                InventoryItem item = new InventoryItem(c.get(0).text(),c.get(1).text(),Double.parseDouble(c.get(2).text()));
+                addItem(item);
+            }
+            reader.close();
+        }catch (FileNotFoundException e){
+            e.printStackTrace();
+        }
         //Use Jsoup to read html file
-        //Todo figure out Jsoup
+
     }
 
-    void jsonReader(){
+    void jsonReader(File file){
         //Clear Inventory
-        //Todo relearn GSON
+        clearList();
+        try {
+            FileReader reader = new FileReader(file);
+            Gson gson = new Gson();
+            ArrayList<InventoryItem> jsonList = gson.fromJson(reader,new TypeToken<ArrayList<InventoryItem>>(){}.getType());
+            for(InventoryItem item:jsonList){
+                addItem(item);
+            }
+
+        }catch (FileNotFoundException e){
+            e.printStackTrace();
+        }
     }
 
     void tsbWriter(File file){
