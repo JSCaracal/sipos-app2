@@ -89,6 +89,15 @@ class InventoryTest {
     }
 
     @Test
+    void isSerialSame(){
+        testInventory.addItem(item1);
+        testInventory.addItem(item2);
+        assertEquals(true,testInventory.isSerialSame("h-0c5-ow3-4dx"));
+        assertEquals(false,testInventory.isSerialSame("x-0c5-ow3-4dx"));
+
+    }
+
+    @Test
     void readFile() {
     }
 

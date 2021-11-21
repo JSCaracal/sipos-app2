@@ -8,12 +8,14 @@
 <?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
 <?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.cell.PropertyValueFactory?>
+<?import javafx.scene.control.cell.TextFieldTableCell?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.HBox?>
 
 <AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="571.0" prefWidth="823.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="main.InventoryManagementController">
    <children>
-      <MenuBar prefHeight="25.0" prefWidth="823.0">
+      <MenuBar fx:id="mainMenuBar" prefHeight="25.0" prefWidth="823.0">
         <menus>
           <Menu mnemonicParsing="false" text="File">
             <items>
@@ -38,7 +40,14 @@
         <columns>
             <TableColumn fx:id="tableColSerialNumber" onEditCommit="#editSerialNumber" prefWidth="340.0" text="Serial Number" />
           <TableColumn fx:id="tableColName" minWidth="8.0" onEditCommit="#editName" prefWidth="303.0" text="Name" />
-          <TableColumn fx:id="tableColPrice" prefWidth="179.0" text="Price" />
+          <TableColumn fx:id="tableColPrice" editable="true" prefWidth="179.0" text="Price">
+              <cellValueFactory>
+                  <PropertyValueFactory property="price" />
+              </cellValueFactory>
+              <cellFactory>
+                  <TextFieldTableCell fx:factory="forTableColumn" />
+              </cellFactory>
+          </TableColumn>
         </columns>
       </TableView>
       <HBox layoutX="7.0" layoutY="530.0" prefHeight="39.0" prefWidth="815.0" spacing="15.0">
@@ -50,7 +59,7 @@
             <TextField fx:id="textFieldPriceAdd" prefHeight="40.0" prefWidth="179.0" promptText="Price" />
          </children>
       </HBox>
-      <HBox layoutX="14.0" layoutY="252.0" prefHeight="25.0" prefWidth="809.0" spacing="200.0">
+      <HBox layoutX="14.0" layoutY="252.0" prefHeight="25.0" prefWidth="591.0" spacing="200.0">
          <children>
             <TextField fx:id="textFieldSerialSearch" onKeyTyped="#searchForSerial" prefHeight="25.0" prefWidth="156.0" promptText="Search by Serial" />
             <TextField fx:id="textFieldNameSearch" onKeyTyped="#searchForName" promptText="Search By Name">
@@ -58,6 +67,12 @@
                   <Insets />
                </HBox.margin>
             </TextField>
+         </children>
+      </HBox>
+      <HBox layoutX="642.0" layoutY="252.0" prefHeight="25.0" prefWidth="179.0" spacing="10.0">
+         <children>
+            <TextField fx:id="editPricePrompt" prefHeight="25.0" prefWidth="92.0" />
+            <Button fx:id="bttnConfirmPriceEdit" mnemonicParsing="false" onAction="#editPrice" text="edit price" />
          </children>
       </HBox>
    </children>

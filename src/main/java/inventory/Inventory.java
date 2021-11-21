@@ -1,5 +1,6 @@
 package inventory;
 
+import com.google.gson.Gson;
 import javafx.beans.InvalidationListener;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
@@ -7,6 +8,8 @@ import javafx.collections.ObservableList;
 import org.jsoup.Jsoup;
 
 import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.*;
 
 
@@ -83,6 +86,17 @@ public class Inventory {
         this.inventoryObList.get(this.inventoryObList.indexOf(item)).setSerialNumber(newSerial);
     }
 
+    public void editPrice(double newPrice, String serialNumber){
+        //Get object for matching purposes
+        InventoryItem item = this.inventoryMap.get(serialNumber);
+        //Change price in Map
+        this.inventoryMap.get(serialNumber).setPrice(newPrice);
+        //Change in Oblist
+        this.inventoryObList.get(this.inventoryObList.indexOf(item)).setPrice(newPrice);
+        //Change in ArrayList
+        this.inventoryArray.get(this.inventoryArray.indexOf(item)).setPrice(newPrice);
+    }
+
    public boolean isValidSerial(String serial){
         if(serial.length() != 13){
             return false;
@@ -100,6 +114,13 @@ public class Inventory {
         return true;
     }
 
+    public boolean isSerialSame(String serial){
+        if(this.inventoryMap.get(serial) != null){
+            return true;
+        }
+        return false;
+    }
+
     void readFile(File file){
         //Try
         //If file is .tsb
@@ -112,12 +133,30 @@ public class Inventory {
 
     }
 
-    void writeFile(File file){
+    public void writeFile(File file){
+        String filePath = file.toString();
         //If file is saved .tsb
-        //Call tsbWriter
+        if(filePath.endsWith(".tsb")){
+            //Call tsbWriter
+            tsbWriter(file);
+            return;
+        }
         //Else if .html
-        //Call .htmlWriter
+        else if(filePath.endsWith(".html")){
+            //Call .htmlWriter
+            htmlWriter(file);
+            return;
+        }
         //Else .jsonWriter
+        else if(filePath.endsWith(".json")) {
+            jsonWriter(file);
+            return;
+        }
+        else {
+            return;
+        }
+
+
     }
     void tsbReader(){
         //Clear the current Inventory to make way for the new Inventory
@@ -146,15 +185,50 @@ public class Inventory {
         //Todo relearn GSON
     }
 
-    void tsbWriter(){
+    void tsbWriter(File file){
         //Save the file using a formatted string
+        try {
+            FileWriter writer = new FileWriter(file);
+            for (InventoryItem item:this.inventoryObList) {
+                writer.write(item.getSerialNumber()+"\t"+item.getName()+"\t"+item.getPrice()+"\n");
+            }
+            writer.close();
+        }catch (IOException e){
+            e.printStackTrace();
+        }
     }
-    void htmlWriter(){
+    void htmlWriter(File file){
         //Save to file using table format
+        try {
+            FileWriter writer = new FileWriter(file);
+            writer.write("<table>\n<tr>\n<th>Serial Number</th>\n<th>Name</th>\n<th>Price</t>\n</tr>");
+            for(InventoryItem item:this.inventoryObList){
+                writer.write("<tr>\n");
+                writer.write("<td>"+item.getSerialNumber()+"</td>\n");
+                writer.write("<td>"+item.getName()+"</td>\n");
+                writer.write("<td>"+item.getPrice()+"</td>\n");
+                writer.write("</tr>");
+            }
+            writer.write("</table>");
+            writer.close();
+
+        }catch (IOException e){
+            e.printStackTrace();
+        }
         //Or use Jsoup
     }
-    void jsonWriter(){
+    void jsonWriter(File file){
+
         //Save using GSON
+        Gson gson = new Gson();
+        try {
+            FileWriter writer = new FileWriter(file);
+            gson.toJson(this.inventoryArray,writer);
+            writer.close();
+        }catch (IOException e){
+
+        }
+
     }
 
     public Map<String, InventoryItem> getInventoryMap() {

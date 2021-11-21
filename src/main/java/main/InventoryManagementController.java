@@ -15,7 +15,11 @@ import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.input.KeyEvent;
+import javafx.stage.FileChooser;
+import javafx.stage.Window;
 
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.net.URL;
 import java.text.NumberFormat;
 import java.util.ResourceBundle;
@@ -24,6 +28,7 @@ public class InventoryManagementController implements Initializable {
     Inventory inventoryList = new Inventory();
     ObservableList<InventoryItem> obList = FXCollections.observableArrayList();
     NumberFormat currency = NumberFormat.getCurrencyInstance();
+    FileChooser fileChooser = new FileChooser();
 
     @FXML
     private Button bttnAdd;
@@ -32,7 +37,13 @@ public class InventoryManagementController implements Initializable {
     private Button bttnDelete;
 
     @FXML
+    private Button bttnConfirmPriceEdit;
+
+    @FXML
     private TableView<InventoryItem> mainTableView;
+
+    @FXML
+    private MenuBar mainMenuBar;
 
     @FXML
     private MenuItem menuItemClearList;
@@ -73,6 +84,9 @@ public class InventoryManagementController implements Initializable {
     @FXML
     private TextField textFieldSerialSearch;
 
+    @FXML
+    private TextField editPricePrompt;
+
     @Override
     public void initialize(URL url, ResourceBundle rb){
         tableColName.setCellValueFactory(
@@ -80,15 +94,18 @@ public class InventoryManagementController implements Initializable {
         );
         tableColName.setCellFactory(TextFieldTableCell.forTableColumn());
 
-        tableColPrice.setCellValueFactory(
+        /**tableColPrice.setCellValueFactory(
                 new PropertyValueFactory<InventoryItem,Double>("price")
-        );
+        );**/
 
         tableColSerialNumber.setCellValueFactory(
                 new PropertyValueFactory<InventoryItem,String>("serialNumber")
         );
         tableColSerialNumber.setCellFactory(TextFieldTableCell.forTableColumn());
+
+
         tableColPrice.setCellFactory(tc->new TableCell<InventoryItem,Double>(){
+
             @Override
             protected void updateItem(Double price, boolean empty){
                 super.updateItem(price,empty);
@@ -100,6 +117,8 @@ public class InventoryManagementController implements Initializable {
             }
                 }
         );
+
+
         FilteredList<InventoryItem> filteredData = new FilteredList<>(inventoryList.getInventoryObList(), p -> true);
 
         // 2. Set the filter Predicate whenever the filter changes.
@@ -161,7 +180,8 @@ public class InventoryManagementController implements Initializable {
     //along with all from the maps and stuff
     @FXML
     void clearListMenu(ActionEvent event) {
-
+        inventoryList.clearList();
+        mainTableView.refresh();
     }
 
     @FXML
@@ -189,10 +209,39 @@ public class InventoryManagementController implements Initializable {
 
 
     @FXML
-    void editSerialNumber(ActionEvent event) {
+    void editSerialNumber(TableColumn.CellEditEvent<InventoryItem,String> event) {
         //get the text input from the tableView
+        InventoryItem item = event.getRowValue();
+        String newSerial = event.getNewValue();
+        //Error handle Bad Serial
+        if(inventoryList.isValidSerial(newSerial) == false){
+            alertNotification("Please make sure the serial you entered is in the format" +
+                    " A-XXX-XXX-XXX, A must be a letter");
+            return;
+        }
         //Call the editSerialNumber function
+        inventoryList.editSerialNumber(newSerial,item);
         //Once enter is pressed update tableview
+        mainTableView.refresh();
+    }
+
+    @FXML
+    void editPrice(ActionEvent event){
+            InventoryItem item = mainTableView.getSelectionModel().getSelectedItem();
+            if(editPricePrompt.getText().equals(null)){
+                alertNotification("The price cannot be left empty");
+                return;
+            }
+            double newPrice;
+            try {
+                newPrice = Double.parseDouble(editPricePrompt.getText());
+            }catch (NumberFormatException e){
+                alertNotification("Make sure you formatted the price corecctly.");
+                return;
+            }
+            inventoryList.editPrice(newPrice,item.getSerialNumber());
+            editPricePrompt.clear();
+            mainTableView.refresh();
     }
 
     @FXML
@@ -227,7 +276,16 @@ public class InventoryManagementController implements Initializable {
     @FXML
     void saveInventory(ActionEvent event) {
         //User menubox
+        Window stage = mainMenuBar.getScene().getWindow();
+        fileChooser.setTitle("Save Inventory");
+        fileChooser.setInitialFileName("InventoryList");
+        fileChooser.getExtensionFilters().addAll(new FileChooser.ExtensionFilter("TSB File","*.tsb")
+        ,new FileChooser.ExtensionFilter("HTML File","*.html"),new FileChooser.ExtensionFilter("JSON file","*" +
+                        ".json"));
         //Call the writeFile method, has required logic
+        File file = fileChooser.showSaveDialog(stage);
+        fileChooser.setInitialDirectory(file);
+        inventoryList.writeFile(file);
     }
 
     @FXML
@@ -286,18 +344,6 @@ public class InventoryManagementController implements Initializable {
         errorAlert.showAndWait();
     }
 
-    void searchHelper(String name){
-        if(inventoryList.searchByName(name).equals("")){
-            return;
-        }
-        else{
-            //Display only the searched result(s)
-            ObservableList<InventoryItem> searchResults;
-            //Make new ObList with only the results
 
-            //remove current table view
-            //If clear return the old list
-        }
-    }
 
 }
