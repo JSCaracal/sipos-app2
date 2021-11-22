@@ -217,6 +217,10 @@ public class InventoryManagementController implements Initializable {
             mainTableView.refresh();
             return;
         }
+        if(inventoryList.isSerialSame(newSerial)){
+            alertNotification("Serial Already exists");
+            return;
+        }
         //Call the editSerialNumber function
         inventoryList.editSerialNumber(newSerial,item);
         //Once enter is pressed update tableview
@@ -357,6 +361,10 @@ public class InventoryManagementController implements Initializable {
         if(!inventoryList.isValidSerial(userInfo[0])){
             alertNotification("Please make sure the serial you entered is in the format " +
                     "A-XXX-XXX-XXX, A must be a letter");
+            return null;
+        }
+        if(inventoryList.isSerialSame(userInfo[0])){
+            alertNotification("Serial Already exists");
             return null;
         }
         if(userInfo[1].length() > 256 || userInfo[1].length() < 2){

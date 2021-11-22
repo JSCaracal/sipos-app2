@@ -12,14 +12,16 @@ class Inventory {
     +void clearList()
     +void editItemName(String newName)
     +void editItemSerialNumber(String newSerial)
+    +boolean isValidSerial(String serialNumber)
+    +boolean isAlreadySerial(String serial)
     +void readFile(File file)
     +void writeFile(File file)
-    +void tsbReader()
-    +void htmlReader()
-    +void jsonReader()
-    +void tsbWriter()
-    +void htmlWriter()
-    +void jsonWriter()
+    +void tsbReader(File file))
+    +void htmlReader(File file)
+    +void jsonReader(File file)
+    +void tsbWriter(File file)
+    +void htmlWriter(File file)
+    +void jsonWriter(File file)
 }
 
 class InventoryItem{
